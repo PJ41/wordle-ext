@@ -12,7 +12,7 @@ function autoCompleteFeature() {
 
   var rowIdx = gameApp.rowIndex;
   if (rowIdx >= 1) {
-    displayCorrects(gameApp, rowIdx)
+    displayCorrects(gameApp, rowIdx);
   }
 }
 
@@ -134,9 +134,10 @@ function letterKeyHandler(gameApp, key) {
 }
 
 function displayCorrects(gameApp, rowIdx) {
-  if (gameApp.evaluations[rowIdx-1].forEach(e => e === "correct")) {
+  if (gameApp.evaluations[rowIdx-1].toString() === "correct,correct,correct,correct,correct") {
     return;
   }
+
   var solution = gameApp.solution;
   var rowTiles = gameApp
   .shadowRoot.querySelectorAll("game-row")[rowIdx]
