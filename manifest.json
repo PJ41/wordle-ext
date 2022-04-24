@@ -1,12 +1,14 @@
 {
-  "name": "Wordle Betterment Suite",
+  "name": "Wordle Enhancement Suite",
   "version": "0.0.1",
   "manifest_version": 3,
-  "description": "WBS ehances the Wordle experience",
+  "description": "WES enhances the Wordle experience",
 
   "icons": {
-    "16": "styles/icon16.png",
-    "128": "styles/icon128.png"
+    "16": "styles/logo16.png",
+    "32": "styles/logo32.png",
+    "64": "styles/logo64.png",
+    "128": "styles/logo128.png"
   },
 
   "content_scripts": [{
