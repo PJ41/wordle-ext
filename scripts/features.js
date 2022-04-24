@@ -153,7 +153,6 @@ function displayCorrects(gameApp, rowIdx) {
 }
 
 function typeLetters(gameApp, letters) {
-  console.log(letters);
   letters.forEach((letter, i) => {
     setTimeout(() => {
       button = gameApp
