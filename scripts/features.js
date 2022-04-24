@@ -1,5 +1,6 @@
 function autoCompleteFeature() {
-  var buttons = document.querySelector("game-app")
+  var gameApp = document.querySelector("game-app");
+  var buttons = gameApp
   .shadowRoot.querySelector("game-keyboard")
   .shadowRoot.querySelectorAll("button");
 
@@ -8,6 +9,11 @@ function autoCompleteFeature() {
   });
 
   document.addEventListener("keydown", realKeyboardHandler, true);
+
+  var rowIdx = gameApp.rowIndex;
+  if (rowIdx >= 1) {
+    displayCorrects(gameApp, rowIdx)
+  }
 }
 
 function realKeyboardHandler(evt) {
@@ -36,7 +42,7 @@ function realKeyboardHandler(evt) {
 function virtualKeyboardHandler(evt) {
   var gameApp = evt.path[10];
 
-  if (rowIdx >= 1 && !gameApp.hardMode) {
+  if (!gameApp.hardMode) {
     return;
   }
 
@@ -47,7 +53,7 @@ function virtualKeyboardHandler(evt) {
       enterHandler(gameApp);
       break;
     case "←":
-      backspaceHandler(gameApp);
+      backspaceHandler(evt, gameApp);
       break;
     default:
       letterKeyHandler(gameApp, keyType);
@@ -56,71 +62,75 @@ function virtualKeyboardHandler(evt) {
 }
 
 function enterHandler(gameApp) {
-  oldIdx = gameApp.rowIndex;
   setTimeout(() => {
-    newIdx = document.querySelector("game-app").rowIndex;
-    if (newIdx > oldIdx) {
-      displayCorrects(gameApp, newIdx)
-    }
+    var rowIdx = gameApp.rowIndex;
+      if (rowIdx >= 1) {
+        displayCorrects(gameApp, rowIdx);
+      }
   }, 1 / Number.MAX_SAFE_INTEGER);
 }
 
-function backspaceHandler(gameApp) {
+function backspaceHandler(evt, gameApp) {
   var rowIdx = gameApp.rowIndex;
 
-  if (rowIdx >= 1) {
-    var solution = gameApp.solution;
-    current = gameApp.boardState[rowIdx];
-
-    var backspaces = [];
-    while (current.length > 0 && current.slice(-1) === solution[current.length-1]) {
-      backspaces.push("←");
-      current = current.slice(0, -1);
-    }
-
-    if (backspaces.length > 0) {
-      typeLetters(gameApp, backspaces);
-    }
-    displayCorrects(gameApp, rowIdx);
+  if (rowIdx < 1) {
+    return;
   }
+
+  var solution = gameApp.solution;
+  currentIdx = gameApp.boardState[rowIdx].length;
+
+  var backspaces = [];
+  while (currentIdx > 0) {
+    currentIdx--;
+    if (previousIsCorrect(gameApp, rowIdx, currentIdx)) {
+      backspaces.push("←");
+    }
+    else {
+      break;
+    }
+  }
+
+  if (currentIdx === 0) {
+    evt.stopPropagation();
+    backspaces = [];
+  }
+
+  if (backspaces.length > 0) {
+    typeLetters(gameApp, backspaces);
+  }
+  displayCorrects(gameApp, rowIdx);
 }
 
 function letterKeyHandler(gameApp, key) {
   var rowIdx = gameApp.rowIndex;
 
-  if (rowIdx >= 1)
-  {
-    var solution = gameApp.solution;
-    current = gameApp.boardState[rowIdx] + key;
-
-    if (current.length > solution.length) {
-      return;
-    }
-
-    typeLetters(gameApp, Array(current.length).fill("←"));
-
-    var idx = 0;
-    var unoMasCheck = false;
-    var letters = [];
-    while (current.length > 0 || unoMasCheck) {
-      unoMasCheck = false;
-      if (current.charAt(0)) {
-        letters.push(current.charAt(0));
-        current = current.slice(1);
-      }
-      else if (previousIsCorrect(gameApp, rowIdx, idx)) {
-        letters.push(solution[idx]);
-      }
-
-      idx++
-      if (!(idx >= solution.length) && previousIsCorrect(gameApp, rowIdx, idx)) {
-        unoMasCheck = true
-      }
-    }
-
-    typeLetters(gameApp, letters);
-    displayCorrects(gameApp, rowIdx);
+  if (rowIdx < 1) {
+    return;
   }
+
+  var solution = gameApp.solution;
+  currentIdx = gameApp.boardState[rowIdx].length;
+
+  var letters = [];
+  for (let i = currentIdx; i < solution.length; i++) {
+    if (previousIsCorrect(gameApp, rowIdx, i)) {
+      letters.push(solution[i]);
+    }
+    else {
+      break;
+    }
+  }
+
+  if (currentIdx === 0) {
+    letters.unshift("←")
+    letters.push(key);
+  }
+
+  if (letters.length > 0) {
+    typeLetters(gameApp, letters);
+  }
+  displayCorrects(gameApp, rowIdx);
 }
 
 function displayCorrects(gameApp, rowIdx) {
@@ -143,6 +153,7 @@ function displayCorrects(gameApp, rowIdx) {
 }
 
 function typeLetters(gameApp, letters) {
+  console.log(letters);
   letters.forEach((letter, i) => {
     setTimeout(() => {
       button = gameApp
@@ -153,10 +164,6 @@ function typeLetters(gameApp, letters) {
       button.addEventListener("click", virtualKeyboardHandler, false);
     }, i / Number.MAX_SAFE_INTEGER);
   });
-}
-
-function previousIsCorrect(gameApp, rowIdx, idx) {
-  return gameApp.evaluations[rowIdx-1][idx] === "correct";
 }
 
 function setTileLetter(rowTile, letter) {
@@ -172,7 +179,7 @@ function setTileLetter(rowTile, letter) {
 
   setTimeout(() => {
     observer.disconnect();
-  }, 500);
+  }, 1000);
 }
 
 function setTileColor(tile) {
@@ -188,7 +195,11 @@ function setTileColor(tile) {
 
   setTimeout(() => {
     observer.disconnect();
-  }, 500);
+  }, 1000);
+}
+
+function previousIsCorrect(gameApp, rowIdx, idx) {
+  return gameApp.evaluations[rowIdx-1][idx] === "correct";
 }
 
 autoCompleteFeature();
