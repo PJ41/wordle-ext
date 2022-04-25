@@ -81,17 +81,21 @@ function backspaceHandler(evt, gameApp) {
   currentIdx = gameApp.boardState[rowIdx].length;
 
   var backspaces = [];
+  var clear = false;
   while (currentIdx > 0) {
     currentIdx--;
     if (previousIsCorrect(gameApp, rowIdx, currentIdx)) {
       backspaces.push("←");
+      if (currentIdx == 0) {
+        clear = true;
+      }
     }
     else {
       break;
     }
   }
 
-  if (currentIdx === 0) {
+  if (clear) {
     evt.stopPropagation();
     backspaces = [];
   }
