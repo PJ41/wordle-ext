@@ -116,9 +116,16 @@ function letterKeyHandler(gameApp, key) {
   var solution = gameApp.solution;
   currentIdx = gameApp.boardState[rowIdx].length;
 
+  var firstCheck = currentIdx === 0 && previousIsCorrect(gameApp, rowIdx, currentIdx);
+
+  if (!firstCheck) {
+    currentIdx++;
+  }
+
   var letters = [];
   for (let i = currentIdx; i < solution.length; i++) {
     if (previousIsCorrect(gameApp, rowIdx, i)) {
+      console.log("here: " + solution[i]);
       letters.push(solution[i]);
     }
     else {
@@ -126,7 +133,7 @@ function letterKeyHandler(gameApp, key) {
     }
   }
 
-  if (currentIdx === 0) {
+  if (firstCheck) {
     letters.unshift("←")
     letters.push(key);
   }
