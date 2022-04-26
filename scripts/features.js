@@ -11,7 +11,7 @@ function autoCompleteFeature() {
   document.addEventListener("keydown", realKeyboardHandler, true);
 
   var rowIdx = gameApp.rowIndex;
-  if (rowIdx >= 1) {
+  if (rowIdx >= 1 && gameApp.hardMode) {
     displayCorrects(gameApp, rowIdx);
   }
 }
