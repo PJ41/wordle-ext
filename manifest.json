@@ -20,9 +20,5 @@
   "web_accessible_resources": [{
     "resources": ["scripts/features.js"],
     "matches": ["<all_urls>"]
-  }],
-
-  "permissions": [
-    "activeTab"
-  ]
+  }]
 }
