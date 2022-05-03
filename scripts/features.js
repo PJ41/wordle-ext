@@ -40,13 +40,13 @@ function realKeyboardHandler(evt) {
 }
 
 function virtualKeyboardHandler(evt) {
-  var gameApp = evt.path[10];
+  var gameApp = document.querySelector("game-app");
 
   if (!gameApp.hardMode) {
     return;
   }
 
-  var keyType = evt.target.getAttribute("data-key");
+  var keyType = evt.currentTarget.getAttribute("data-key");
 
   switch (keyType) {
     case "↵":
@@ -125,7 +125,6 @@ function letterKeyHandler(gameApp, key) {
   var letters = [];
   for (let i = currentIdx; i < solution.length; i++) {
     if (previousIsCorrect(gameApp, rowIdx, i)) {
-      console.log("here: " + solution[i]);
       letters.push(solution[i]);
     }
     else {
